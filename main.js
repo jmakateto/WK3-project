@@ -1,51 +1,62 @@
-// Function to render films
-function renderFilms(films) {
-    const filmsList = document.getElementById('films');
-    filmsList.innerHTML = '';
-  
-    films.forEach(film => {
-      const filmItem = document.createElement('li');
-      filmItem.innerHTML = `
-        <span>${film.title}</span>
-        <button class="deleteBtn" data-id="${film.id}">Delete</button>
-      `;
-      filmsList.appendChild(filmItem);
-    });
-  
-    // Add event listeners to the delete buttons
-    const deleteButtons = document.querySelectorAll('.deleteBtn');
-    deleteButtons.forEach(btn => {
-      btn.addEventListener('click', handleDelete);
-    });
-  }
-  
-  // Function to handle the delete button click
-  function handleDelete(event) {
-    const filmId = event.target.dataset.id;
-    
-    // Make a DELETE request to the server
-    fetch(`/films/${filmId}`, {
-      method: 'DELETE',
+// Function to render movie details
+function renderMovieDetails(movie) {
+  const movieDetails = document.getElementById('movieDetails');
+  const title = movieDetails.querySelector('h2');
+  const poster = movieDetails.querySelector('#poster');
+  const runtime = movieDetails.querySelector('#runtime');
+  const showtime = movieDetails.querySelector('#showtime');
+  const availableTickets = movieDetails.querySelector('#availableTickets');
+  const buyBtn = movieDetails.querySelector('#buyBtn');
+
+  title.textContent = movie.title;
+  poster.src = movie.poster;
+  runtime.textContent = `Runtime: ${movie.runtime} minutes`;
+  showtime.textContent = `Showtime: ${movie.showtime}`;
+  availableTickets.textContent = `Available Tickets: ${movie.capacity - movie.tickets_sold}`;
+  buyBtn.disabled = movie.capacity - movie.tickets_sold === 0;
+}
+
+// Function to fetch movie details by ID
+function fetchMovieData(id) {
+  fetch(`http://localhost:3000/films/${id}`)
+    .then(response => response.json())
+    .then(movie => {
+      renderMovieDetails(movie);
     })
-      .then(() => {
-        // Remove the film from the DOM
-        const filmItem = event.target.parentElement;
-        filmItem.remove();
-      })
-      .catch(error => {
-        console.error('Error deleting film:', error);
-      });
-  }
-  
-  // Sample films data
-  const films = [
-    { id: '1', title: 'Film 1' },
-    { id: '2', title: 'Film 2' },
-    { id: '3', title: 'Film 3' }
-  ];
-  
-  // Render films on page load
-  document.addEventListener('DOMContentLoaded', () => {
-    renderFilms(films);
+    .catch(error => {
+      console.error('Error fetching movie data:', error);
+    });
+}
+
+// Function to render film menu
+function renderFilmMenu(films) {
+  const filmsList = document.getElementById('films');
+  filmsList.innerHTML = '';
+
+  films.forEach(film => {
+    const filmItem = document.createElement('li');
+    filmItem.textContent = film.title;
+    filmItem.addEventListener('click', () => {
+      fetchMovieData(film.id);
+    });
+    filmsList.appendChild(filmItem);
   });
-  
+}
+
+// Function to fetch all movies
+function fetchAllMovies() {
+  fetch('http://localhost:3000/films')
+    .then(response => response.json())
+    .then(films => {
+      renderFilmMenu(films);
+      if (films.length > 0) {
+        fetchMovieData(films[0].id);
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching movies:', error);
+    });
+}
+
+// Fetch all movies on page load
+document.addEventListener('DOMContentLoaded', fetchAllMovies);

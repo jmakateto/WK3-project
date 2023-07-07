@@ -1,0 +1,15 @@
+{
+  "name": "wk3-project",
+  "version": "1.0.0",
+  "description": "Flatdango is a web application that allows users to browse and purchase movie tickets from Flatiron Movie Theater. The app retrieves movie data from a local server and provides a user-friendly interface for interacting with the movie listings.",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
